@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#e879a9"><link rel="manifest" href="manifest.json">
+<title>Tabungan Darurat</title>
+<style>
+:root{--pink:#e879a9;--bg:#fff5fa;--ink:#382936}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px system-ui;padding:22px}
+main{max-width:480px;margin:auto}.card{background:white;border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 6px 22px #7b3c5b12}
+h1{font-size:25px;margin:5px 0}p{color:#786675}.hero{background:#fce2ee}
+label{display:block;font-weight:650;margin:14px 0 6px}input,select{width:100%;padding:13px;border:1px solid #e8cbd9;border-radius:12px;font:inherit}
+button{background:var(--pink);border:0;color:white;padding:13px 18px;border-radius:12px;font-weight:700;width:100%;margin-top:12px}
+.big{font-size:32px;font-weight:800;color:#b83d79}.muted{font-size:13px;color:#806e7b}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{background:#fff5fa;padding:13px;border-radius:14px}.tile strong{display:block;margin-top:5px}
+</style></head><body><main>
+<h1>💗 Tabungan Darurat</h1><p>Jaga tabungan, tetap utamakan kebutuhan penting.</p>
+<section class="card"><label for="savings">Total tabungan (Rp)</label><input id="savings" type="number" min="0" value="100000">
+<label for="rate">Batas pengambilan normal (%)</label><input id="rate" type="number" min="1" max="50" value="10">
+<div class="hero card"><div class="muted">Maksimal pengambilan normal</div><div class="big" id="max">Rp10.000</div><div class="muted">Sisa jika mengambil maksimal</div><strong id="remain">Rp90.000</strong></div>
+<label for="purpose">Keperluan</label><select id="purpose"><option>Kebutuhan mendesak</option><option>Makan / kebutuhan pokok</option><option>Transportasi penting</option><option>Kebutuhan sekolah</option><option>Jajan (bukan darurat)</option></select>
+<label for="take">Jumlah yang ingin diambil (Rp)</label><input id="take" type="number" min="0" placeholder="Contoh: 5000">
+<div class="grid"><div class="tile"><span class="muted">Sisa setelah pengambilan</span><strong id="after">Rp100.000</strong></div><div class="tile"><span class="muted">Status</span><strong id="status">Belum dihitung</strong></div></div>
+<button id="save">Simpan angka di perangkat ini</button><p class="muted" id="saved">Perhitungan tersimpan hanya di perangkat/browser ini.</p>
+</section><section class="card"><b>Aturan bijak 💡</b><p>10% adalah batas panduan untuk keadaan darurat biasa, bukan aturan mutlak. Kebutuhan pokok dan keselamatan tetap didahulukan. Jangan gunakan tabungan darurat untuk jajan.</p></section>
+</main><script>
+const $=id=>document.getElementById(id), money=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
+function calc(){let s=Math.max(0,+$('savings').value||0),r=Math.min(50,Math.max(1,+$('rate').value||10)),m=Math.floor(s*r/100),t=Math.max(0,+$('take').value||0);
+$('max').textContent=money(m);$('remain').textContent=money(s-m);$('after').textContent=money(Math.max(0,s-t));
+let p=$('purpose').value;$('status').textContent=p.startsWith('Jajan')?'Bukan darurat':t===0?'Belum dihitung':t<=m?'Dalam batas':'Evaluasi kebutuhan';}
+['savings','rate','take','purpose'].forEach(id=>$(id).addEventListener('input',calc));
+$('save').onclick=()=>{localStorage.setItem('tabungan-darurat',JSON.stringify({savings:$('savings').value,rate:$('rate').value}));$('saved').textContent='Tersimpan di perangkat ini ✓'};
+try{let d=JSON.parse(localStorage.getItem('tabungan-darurat')||'null');if(d){$('savings').value=d.savings;$('rate').value=d.rate}}catch(e){}
+calc();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+</script></body></html>
